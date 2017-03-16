@@ -20,8 +20,6 @@ tackles_by_player <- tournament_data %>%
   ) %>%
   arrange(desc(tackle_success)) %>%
   filter(tackles > 50)
-nrow(tackles_by_player)
-head(tackles_by_player, n = 20, wt = tackle_success)
 
 
 # Carries
@@ -54,8 +52,6 @@ offloads_by_player <- tournament_data %>%
             game_minutes = sum(minutes_played_total)
   ) %>%
   arrange(desc(offload))
-nrow(offloads_by_player)
-head(offloads_by_player, n = 20, wt = offload)
 
 # Passes
 
@@ -67,8 +63,6 @@ passes_by_player <- tournament_data %>%
             game_minutes = sum(minutes_played_total)
   ) %>%
   arrange(desc(passes))
-nrow(passes_by_player)
-head(passes_by_player, n = 20, wt = passes)
 
 # Turnovers
 
@@ -78,9 +72,6 @@ turnovers_by_player <- tournament_data %>%
     turnover_won = sum(turnover_won),
     turnovers_conceded = sum(turnovers_conceded)
   ) %>% arrange(desc(turnovers_conceded))
-nrow(turnovers_by_player)
-head(turnovers_by_player, n = 20, wt = turnovers_conceded)
-
 
 
 # Total Lineouts
