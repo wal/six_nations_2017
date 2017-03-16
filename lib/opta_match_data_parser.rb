@@ -42,6 +42,7 @@ class OptaMatchDataParser
 
       team_match_statistics << { player_ref: player_ref,
                                  player_name: player_name(player_ref),
+                                 position: player_position(player_ref),
                                  team: team_name,
                                  opposition: opposition_name }.merge(player_stats)
     end
@@ -51,6 +52,10 @@ class OptaMatchDataParser
 
   def player_name(player_ref)
     load_player_records[player_ref][:name]
+  end
+
+  def player_position(player_ref)
+    load_player_records[player_ref][:position]
   end
 
   def parse_opta_json_file(json_file_name)
@@ -74,7 +79,8 @@ class OptaMatchDataParser
       team['Player'].map do |player|
         player_id = player['@attributes']['uID']
         formatted_name = "#{player['PersonName']['Last']}, #{player['PersonName']['First']}"
-        players[player_id] =  { name: formatted_name, team: team_name}
+        position = "#{player['@attributes']['Position']}"
+        players[player_id] =  { name: formatted_name, team: team_name, position: position}
       end
     end
 
