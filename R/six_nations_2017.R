@@ -8,6 +8,30 @@ tournament_data <- tournament_data %>% separate(position, c('position_type', 'po
 
 # Variables
 metric_names = sort(names(tournament_data))
+metric_names[grep('lineout', metric_names)]
+
+# Question: Ireland lineout is ineffective
+lineouts_by_team <- tournament_data %>% 
+  group_by(team) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    lineout_throw_lost_free_kick = sum(lineout_throw_lost_free_kick),
+    lineout_throw_lost_handling_error = sum(lineout_throw_lost_handling_error),
+    lineout_throw_lost_not_straight = sum(lineout_throw_lost_not_straight),
+    lineout_throw_lost_outright = sum(lineout_throw_lost_outright),
+    lineout_throw_lost_penalty = sum(lineout_throw_lost_penalty),
+    win_percentage = lineouts_won/total_lineouts * 100,
+    wp_rank = rank(win_percentage)
+  ) %>% select(team, total_lineouts, win_percentage)
+
+lineouts_by_team$wp_rank <- (nrow(lineouts_by_team) - rank(lineouts_by_team$win_percentage)) + 1
+
+lineouts_stolen <- tournament_data %>%
+  group_by(team, player_name) %>%
+  summarise(
+    lineout_won_steal = sum(lineout_won_steal))
 
 
 # Tackles
@@ -18,8 +42,7 @@ tackles_by_player <- tournament_data %>%
             tackle_success = mean(tackle_success), 
             matches = n(),
             game_minutes = sum(minutes_played_total),
-            tackles_per_game = tackles / matches
-  ) 
+            tackles_per_game = tackles / matches) 
 
 
 # Carries
