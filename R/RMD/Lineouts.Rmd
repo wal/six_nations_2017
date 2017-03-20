@@ -1,0 +1,97 @@
+---
+title: "Six Nations 2017 - Lineout Analysis"
+author: 'Wal McConnell'
+output:
+  pdf_document: default
+  html_document: default
+date: "20 March 2017"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+tournament_data = read.csv(file = '../../data/tournament.csv')
+tournament_data <- tournament_data %>% separate(position, c('position_type', 'position_numnber'))
+```
+# Lineout
+
+Ireland had a 91% success rate from the Lineout on their own ball, despite having the (joint) most lineouts (72) of the tournament. Tournament winners England lost only three of their own lineouts (2 v Ireland, 1 v France).
+
+```{r, echo=FALSE}
+lineouts_by_team <- tournament_data %>% 
+  group_by(team) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
+  ) %>% arrange(desc(win_percentage))
+
+kable(lineouts_by_team, caption = "Lineouts By Team", col.names = c('Team', 'Total', 'Won', 'Lost', 'Win %'))
+```
+
+## Lineout Attack
+
+Three of Irelands six lost lineouts occurred in their defeat by Wales.
+
+```{r, echo = FALSE}
+ireland_lineouts_lost_by_opposition <- tournament_data %>% 
+  filter(team == 'Ireland') %>%
+  group_by(team, opposition) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
+  ) %>% arrange(desc(lineouts_lost))
+
+kable(ireland_lineouts_lost_by_opposition, caption = "Lineouts By Team", col.names = c('Team', 'Opposition', 'Total', 'Won', 'Lost', 'Win %'))
+
+```
+
+Behind Italy, Ireland and Scotland jointly had the most lineouts stolen against in the tournament
+
+```{r, echo = FALSE}
+lineouts_stolen_against <- tournament_data %>%
+  group_by(opposition) %>%
+  summarise(lineout_won_steal = sum(lineout_won_steal)) %>% 
+  arrange(desc(lineout_won_steal)) %>% 
+  filter(lineout_won_steal > 0)
+
+kable(lineouts_stolen_against, caption = "Lineouts Stolen", col.names = c('Team', 'Lineouts Stolen'))
+```
+
+
+Rory Best threw at 88% for the tournament, though the not straight lineout against England was intentional/tactical.
+
+```{r, echo = FALSE}
+rory_best_lineout_throw_lost <- tournament_data %>% 
+  filter(team == 'Ireland', player_name == 'Best, Rory') %>%
+  group_by(opposition) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineout_success = round(mean(lineout_success) * 100, 1),
+    lineout_throw_lost_outright = sum(lineout_throw_lost_outright),
+    lineout_throw_lost_handling_error = sum(lineout_throw_lost_handling_error),
+    lineout_throw_lost_not_straight = sum(lineout_throw_lost_not_straight)
+  ) %>% filter(lineout_success < 100)
+
+kable(rory_best_lineout_throw_lost, caption = "Rory Best - Throw Success", col.names = c('Opposition', 'Total', '% Success', 'Lost Outright', 'Lost - Handling Error', 'Lost - Not Straight'))
+```
+
+## Lineout Defence
+
+Ireland stole 4 opposition lineouts through Devin Toner, Iain Henderson and Peter O'Mahony. Englands Itoje stealing 3 on the opposition throw (2 v Italy, 1 v Scotland).
+
+```{r, echo = FALSE}
+lineouts_stolen <- tournament_data %>%
+  group_by(team, player_name) %>%
+  summarise(lineout_won_steal = sum(lineout_won_steal)) %>% 
+  arrange(desc(lineout_won_steal), team, player_name) %>% 
+  filter(lineout_won_steal > 0)
+
+kable(lineouts_stolen, caption = "Lineout Stolen", col.names = c('Team', 'Player', 'Lineouts Stolen'))
+```
+
+

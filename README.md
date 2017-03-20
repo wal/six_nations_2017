@@ -1,1 +1,1 @@
-Playing about with Six Nations performance data
+Playground for a Six Nations 2017 performance dataset
