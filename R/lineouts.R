@@ -1,8 +1,7 @@
-source('common.R')
-
+source('R/common.R')
 
 metric_names = sort(names(tournament_data))
-metric_names[grep('lineout', metric_names)]
+metric_names[grep('lineout_throw', metric_names)]
 
 lineouts_by_team <- tournament_data %>% 
   group_by(team) %>%
@@ -53,10 +52,11 @@ lineouts_stolen_against <- tournament_data %>%
   filter(lineout_won_steal > 0)
 
 lineouts_won <- tournament_data %>%
-  group_by(player_name) %>%
+  group_by(team) %>%
   summarise(
     lineout_throw_won_tap = sum(lineout_throw_won_tap),
     lineout_throw_won_penalty = sum(lineout_throw_won_penalty),
-    lineout_throw_lost_penalty = sum(lineout_throw_lost_penalty),
-    something = (lineout_throw_won_tap + lineout_throw_won_penalty + lineout_throw_lost_penalty)
+    lineout_throw_won_free_kick = sum(lineout_throw_won_free_kick),
+    lineout_throw_won_clean = sum(lineout_throw_won_clean),
+    something = (lineout_throw_won_tap + lineout_throw_won_penalty)
   ) %>% filter(something > 0)

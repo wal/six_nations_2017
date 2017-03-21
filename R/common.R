@@ -1,5 +1,4 @@
 library(tidyverse)
-library(rmarkdown)
 
 tournament_data = read.csv(file = 'data/tournament.csv')
 

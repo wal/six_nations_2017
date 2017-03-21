@@ -16,7 +16,7 @@ tournament_data <- tournament_data %>% separate(position, c('position_type', 'po
 ```
 # Lineout
 
-Ireland had a 91% success rate from the Lineout on their own ball, despite having the (joint) most lineouts (72) of the tournament. Tournament winners England lost only three of their own lineouts (2 v Ireland, 1 v France).
+Ireland had a 91.7% success rate from the Lineout on their own ball, despite having the (joint) most lineouts (72) of the tournament. Tournament winners England lost only three of their own lineouts (2 v Ireland, 1 v France).
 
 ```{r, echo=FALSE}
 lineouts_by_team <- tournament_data %>% 
@@ -31,9 +31,20 @@ lineouts_by_team <- tournament_data %>%
 kable(lineouts_by_team, caption = "Lineouts By Team", col.names = c('Team', 'Total', 'Won', 'Lost', 'Win %'))
 ```
 
-## Lineout Attack
+Irelands winning 22 from 22 lineouts v France was their best showing, while three of Irelands six lost lineouts occurred in their defeat by Wales 
 
-Three of Irelands six lost lineouts occurred in their defeat by Wales.
+```{r, fig.width=7, fig.height=4, echo = FALSE}
+lineouts_lost_by_opposition <- tournament_data %>% 
+  group_by(team, opposition) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
+  ) %>% arrange(desc(lineouts_lost), opposition)
+
+ggplot(lineouts_lost_by_opposition, aes(opposition, team)) + geom_tile(aes(fill = lineouts_lost))
+```
 
 ```{r, echo = FALSE}
 ireland_lineouts_lost_by_opposition <- tournament_data %>% 
