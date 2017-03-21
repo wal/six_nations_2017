@@ -1,4 +1,5 @@
 library(tidyverse)
+install.packages('rmarkdown')
 
 tournament_data = read.csv(file = 'data/tournament.csv')
 

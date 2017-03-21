@@ -20,7 +20,17 @@ ireland_lineouts_lost_by_opposition <- tournament_data %>%
     lineouts_won = sum(lineouts_won), 
     lineouts_lost = sum(lineouts_lost),
     win_percentage = round(lineouts_won/total_lineouts * 100, 1)
-  ) %>% arrange(desc(lineouts_lost))
+  ) %>% arrange(desc(lineouts_lost), opposition)
+
+england_lineouts_lost_by_opposition <- tournament_data %>% 
+  filter(team == 'England') %>%
+  group_by(team, opposition) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
+  ) %>% arrange(desc(lineouts_lost), opposition)
 
 ireland_lineout_success_by_player <- tournament_data %>% 
   filter(team == 'Ireland', lineout_success > 0) %>%
@@ -60,3 +70,18 @@ lineouts_won <- tournament_data %>%
     lineout_throw_won_clean = sum(lineout_throw_won_clean),
     something = (lineout_throw_won_tap + lineout_throw_won_penalty)
   ) %>% filter(something > 0)
+
+
+lineouts_lost_by_opposition <- tournament_data %>% 
+  group_by(team, opposition) %>%
+  summarise(
+    total_lineouts = sum(total_lineouts),
+    lineouts_won = sum(lineouts_won), 
+    lineouts_lost = sum(lineouts_lost),
+    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
+  ) %>% arrange(desc(lineouts_lost), opposition)
+
+
+ggplot(lineouts_lost_by_opposition, aes(opposition, team)) + geom_tile(aes(fill = win_percentage))
+
+
