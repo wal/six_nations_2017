@@ -1,0 +1,83 @@
+---
+title: "Six Nations 2017 - Tackle Analysis"
+author: 'Wal McConnell'
+output:
+  pdf_document: default
+  html_document: default
+date: "21 March 2017"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+tournament_data = read.csv(file = '../../data/tournament.csv')
+tournament_data <- tournament_data %>% separate(position, c('position_type', 'position_numnber'))
+```
+
+# Team Tackle Count
+
+Ireland had the best overall tackle success rate in the tournament, despite making the fewest tackles.
+
+```{r, echo=FALSE}
+tackles_by_team <- tournament_data %>% 
+  group_by(team) %>% 
+  summarise(tackles = sum(tackles), 
+            missed_tackles = sum(missed_tackles), 
+            tackle_win_pct = round((1 -(missed_tackles/tackles)) * 100, 1)) %>%
+        arrange(desc(tackle_win_pct))
+
+kable(tackles_by_team, caption = "Tackles By Team", col.names = c('Team', 'Tackles', 'Missed', 'Tackle Success %'))
+```
+
+The Ireland and Scotland forwards the only teams to consistently achieve a tackle success rate in the 90's. 
+
+```{r, echo=FALSE}
+tackles_by_team_position <- tournament_data %>% 
+  filter(position_type == 'Back' | position_type == 'Forward') %>%
+  group_by(team, opposition, position_type) %>% 
+  summarise(tackles = sum(tackles), 
+            missed_tackles = sum(missed_tackles), 
+            tackle_win_pct = round((1 -(missed_tackles/tackles)) * 100, 0)) %>%
+        arrange(desc(tackle_win_pct))
+
+ggplot(tackles_by_team_position, aes(opposition, team)) +
+  geom_tile(aes(fill = tackle_win_pct)) + 
+  geom_text(aes(label = paste(tackle_win_pct, " %")), size = 2) +
+  scale_fill_gradient(low = "red", high = "green") +
+  labs(fill='Tackle Win %') +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_grid(~ position_type)
+```
+
+# Player Tackle Count
+
+Despite only playing 4 games, Jamie Heaslip was Irelands (joint) highest tackler with CJ stander. Both missed only a single tackle. Scotlands Richie Gray the only player in the top 50 to not miss a tackle. Alex Dunbar was the only back in the top 20. 
+
+```{r, echo= FALSE}
+tackles_by_player <- tournament_data %>% 
+  group_by(team, player_name, position_type) %>% 
+  summarise(tackles = sum(tackles), 
+            missed_tackles = sum(missed_tackles), 
+            game_minutes = sum(minutes_played_total),
+            tackle_win_pct = round((1 -(missed_tackles/tackles)) * 100, 1)) %>%
+        arrange(desc(tackles))
+
+kable(head(tackles_by_player, 20), caption = "Top 20 Tackle count By Player", col.names = c('Team', 'Player','Position', 'Tackles', 'Missed', 'Minutes', 'Tackle Success %'))
+```
+
+Irelands Sexton and Henderson completed the tournament without missing a tackle.
+
+```{r, echo= FALSE}
+ireland_tackles_by_player <- tournament_data %>% 
+  filter(team == 'Ireland') %>%
+  group_by(team, player_name) %>% 
+  summarise(tackles = sum(tackles), 
+            missed_tackles = sum(missed_tackles), 
+            matches = n(),
+            game_minutes = sum(minutes_played_total),
+            tackle_win_pct = round((1 -(missed_tackles/tackles)) * 100, 1)) %>%
+        arrange(desc(tackles))
+
+kable(ireland_tackles_by_player, caption = "Ireland - Tackle count By Player", col.names = c('Team', 'Player', 'Tackles', 'Missed', 'Matches', 'Minutes', 'Tackle Success %'))
+```
