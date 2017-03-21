@@ -34,7 +34,7 @@ kable(lineouts_by_team, caption = "Lineouts By Team", col.names = c('Team', 'Tot
 Irelands winning 22 from 22 lineouts v France was their best showing, while three of Irelands six lost lineouts occurred in their defeat by Wales 
 
 ```{r, fig.width=7, fig.height=4, echo = FALSE}
-lineouts_lost_by_opposition <- tournament_data %>% 
+lineouts_won_by_opposition <- tournament_data %>% 
   group_by(team, opposition) %>%
   summarise(
     total_lineouts = sum(total_lineouts),
@@ -43,39 +43,57 @@ lineouts_lost_by_opposition <- tournament_data %>%
     win_percentage = round(lineouts_won/total_lineouts * 100, 1)
   ) %>% arrange(desc(lineouts_lost), opposition)
 
-ggplot(lineouts_lost_by_opposition, aes(opposition, team)) + 
-  geom_tile(aes(fill = lineouts_lost)) +
-  geom_text(aes(label = paste(lineouts_lost, " / ", total_lineouts))) +
-  scale_fill_gradient(low = "white", high = "red") 
+ggplot(lineouts_won_by_opposition, aes(opposition, team)) + 
+  geom_tile(aes(fill = win_percentage)) + 
+  geom_text(aes(label = paste(lineouts_won, " / ", total_lineouts))) +
+  scale_fill_gradient(low = "red", high = "green") +
+  labs(fill='Win %') 
 ```
 
+### Lineouts Stolen
+
+Behind Italy, Ireland and Scotland jointly had the most lineouts stolen in the tournament
+
 ```{r, echo = FALSE}
-ireland_lineouts_lost_by_opposition <- tournament_data %>% 
+lineouts_stolen_against <- tournament_data %>%
+  group_by(opposition) %>%
+  summarise(lineout_won_steal = sum(lineout_won_steal), stolen_percentage = round(((lineout_won_steal / sum(total_lineouts)) * 100), 1)) %>% 
+  arrange(desc(lineout_won_steal)) %>% 
+  filter(lineout_won_steal > 0)
+
+kable(lineouts_stolen_against, caption = "Lineouts Stolen", col.names = c('Team', 'Lineouts Stolen', 'Stolen Lineout %'))
+```
+
+
+Ireland stole 4 opposition lineouts through Devin Toner, Iain Henderson and Peter O'Mahony. Englands Maro Itoje stealing 3 on the opposition throw (2 v Italy, 1 v Scotland).
+
+```{r, echo = FALSE}
+lineouts_stolen <- tournament_data %>%
+  group_by(team, player_name) %>%
+  summarise(lineout_won_steal = sum(lineout_won_steal)) %>% 
+  arrange(desc(lineout_won_steal), team, player_name) %>% 
+  filter(lineout_won_steal > 0)
+
+kable(lineouts_stolen, caption = "Lineout Stolen", col.names = c('Team', 'Player', 'Lineouts Stolen'))
+```
+
+### Lineout Throwing Accuracy
+
+```{r, echo = FALSE}
+ireland_lineout_throwers <- tournament_data %>% 
   filter(team == 'Ireland') %>%
-  group_by(team, opposition) %>%
+  group_by(player_name) %>%
   summarise(
     total_lineouts = sum(total_lineouts),
     lineouts_won = sum(lineouts_won), 
     lineouts_lost = sum(lineouts_lost),
     win_percentage = round(lineouts_won/total_lineouts * 100, 1)
-  ) %>% arrange(desc(lineouts_lost))
-
-kable(ireland_lineouts_lost_by_opposition, caption = "Lineouts By Team", col.names = c('Team', 'Opposition', 'Total', 'Won', 'Lost', 'Win %'))
-
+  ) %>% 
+  filter(total_lineouts > 0) %>% 
+  arrange(desc(total_lineouts))
+                
+kable(ireland_lineout_throwers, caption = "Ireland - Lineout Throw Success", col.names = c('Player', 'Lineouts', 'Won', 'Lost', '% Success'))
 ```
-
-Behind Italy, Ireland and Scotland jointly had the most lineouts stolen against in the tournament
-
-```{r, echo = FALSE}
-lineouts_stolen_against <- tournament_data %>%
-  group_by(opposition) %>%
-  summarise(lineout_won_steal = sum(lineout_won_steal)) %>% 
-  arrange(desc(lineout_won_steal)) %>% 
-  filter(lineout_won_steal > 0)
-
-kable(lineouts_stolen_against, caption = "Lineouts Stolen", col.names = c('Team', 'Lineouts Stolen'))
-```
-
 
 Rory Best threw at 88% for the tournament, though the not straight lineout against England was intentional/tactical.
 
@@ -93,19 +111,3 @@ rory_best_lineout_throw_lost <- tournament_data %>%
 
 kable(rory_best_lineout_throw_lost, caption = "Rory Best - Throw Success", col.names = c('Opposition', 'Total', '% Success', 'Lost Outright', 'Lost - Handling Error', 'Lost - Not Straight'))
 ```
-
-## Lineout Defence
-
-Ireland stole 4 opposition lineouts through Devin Toner, Iain Henderson and Peter O'Mahony. Englands Itoje stealing 3 on the opposition throw (2 v Italy, 1 v Scotland).
-
-```{r, echo = FALSE}
-lineouts_stolen <- tournament_data %>%
-  group_by(team, player_name) %>%
-  summarise(lineout_won_steal = sum(lineout_won_steal)) %>% 
-  arrange(desc(lineout_won_steal), team, player_name) %>% 
-  filter(lineout_won_steal > 0)
-
-kable(lineouts_stolen, caption = "Lineout Stolen", col.names = c('Team', 'Player', 'Lineouts Stolen'))
-```
-
-
