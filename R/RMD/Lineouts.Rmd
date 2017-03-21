@@ -4,7 +4,7 @@ author: 'Wal McConnell'
 output:
   pdf_document: default
   html_document: default
-date: "20 March 2017"
+date: "21 March 2017"
 ---
 
 ```{r setup, include=FALSE}
@@ -95,7 +95,7 @@ ireland_lineout_throwers <- tournament_data %>%
 kable(ireland_lineout_throwers, caption = "Ireland - Lineout Throw Success", col.names = c('Player', 'Lineouts', 'Won', 'Lost', '% Success'))
 ```
 
-Rory Best threw at 88% for the tournament, though the not straight lineout against England was intentional/tactical.
+Rory Best threw at 89% for the tournament, though the not straight lineout against England was intentional/tactical.
 
 ```{r, echo = FALSE}
 rory_best_lineout_throw_lost <- tournament_data %>% 
