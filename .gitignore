@@ -1,5 +1,8 @@
 .idea
 *.lock
 .DS_Store
+i
+.RData
+.Rhistory
 
 .Rproj.user
