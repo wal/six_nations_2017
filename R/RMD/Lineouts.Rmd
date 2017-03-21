@@ -49,23 +49,6 @@ ggplot(lineouts_lost_by_opposition, aes(opposition, team)) +
   scale_fill_gradient(low = "white", high = "red") 
 ```
 
-```{r, fig.width=7, fig.height=4, echo = FALSE}
-lineouts_won_by_opposition <- tournament_data %>% 
-  group_by(team, opposition) %>%
-  summarise(
-    total_lineouts = sum(total_lineouts),
-    lineouts_won = sum(lineouts_won), 
-    lineouts_lost = sum(lineouts_lost),
-    win_percentage = round(lineouts_won/total_lineouts * 100, 1)
-  ) %>% arrange(desc(lineouts_lost), opposition)
-
-ggplot(lineouts_won_by_opposition, aes(opposition, team)) + 
-  geom_tile(aes(fill = lineouts_won)) + 
-  geom_text(aes(label = paste(lineouts_won, " / ", total_lineouts))) +
-  scale_fill_gradient(low = "red", high = "green") 
-```
-
-
 ```{r, echo = FALSE}
 ireland_lineouts_lost_by_opposition <- tournament_data %>% 
   filter(team == 'Ireland') %>%
