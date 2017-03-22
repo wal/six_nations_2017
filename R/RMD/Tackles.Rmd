@@ -81,3 +81,17 @@ ireland_tackles_by_player <- tournament_data %>%
 
 kable(ireland_tackles_by_player, caption = "Ireland - Tackle count By Player", col.names = c('Team', 'Player', 'Tackles', 'Missed', 'Matches', 'Minutes', 'Tackle Success %'))
 ```
+
+France, Italy and Scotland had to make their highest number of tackes in the tournament against Ireland.
+
+```{r, echo = FALSE}
+ireland_tackles_by_opposition <- tournament_data %>%
+  group_by(team, opposition) %>%
+  summarise(tackles = sum(tackles)) %>%
+  arrange(desc(tackles))
+
+ggplot(ireland_tackles_by_opposition, mapping = aes(y = tackles, x = opposition)) + 
+  geom_bar(stat = 'identity') +
+  geom_text(aes(label = tackles), size = 2, vjust = -1) +
+  facet_wrap(~ team, nrow = 3)
+```
