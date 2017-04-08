@@ -1,0 +1,107 @@
+---
+title: "Six Nations 2017 - Carries Analysis"
+author: 'Wal McConnell'
+output:
+  pdf_document: default
+  html_document: default
+date: "22 March 2017"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+tournament_data = read.csv(file = '../../data/tournament.csv')
+tournament_data <- tournament_data %>% separate(position, c('position_type', 'position_numnber'))
+```
+
+# Team Carries
+
+The Ireland Backs and Forwards carried the ball, and had more carries over the gain line than any other team in the tournament.
+
+```{r, fig.width=3.5, fig.height=4, echo = FALSE}
+carries_by_team_position <- tournament_data %>% 
+  group_by(team, position_type) %>% 
+  filter(position_type == 'Back' || position_type == 'Forward') %>%
+  summarise(carries_metres = sum(carries_metres), 
+            carries_crossed_gain_line = sum(carries_crossed_gain_line), 
+            carries_not_made_gain_line = sum(carries_not_made_gain_line), 
+            carries_support = sum(carries_support), 
+            carries = carries_crossed_gain_line + carries_not_made_gain_line + carries_support,
+            game_minutes = sum(minutes_played_total)) %>%
+  select(team, position_type, carries, carries_crossed_gain_line, carries_metres) %>%
+  arrange(desc(carries)) 
+
+ggplot(carries_by_team_position, aes(x = team, y = carries)) + 
+  geom_bar(stat = 'identity') + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ position_type) +
+  labs(y = 'Total Carries')
+
+ggplot(carries_by_team_position, aes(x = team, y = carries_crossed_gain_line)) + 
+  geom_bar(stat = 'identity') + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ position_type)  +
+  labs(y = 'Carries over gain line')
+```
+
+# Player Carries
+
+In terms of carry count, Ireland had 6 players in the tournament top 10
+
+```{r, echo=FALSE}
+carries_by_player <- tournament_data %>% 
+  group_by(team, player_name) %>% 
+  summarise(carries_metres = sum(carries_metres), 
+            carries_crossed_gain_line = sum(carries_crossed_gain_line), 
+            carries_not_made_gain_line = sum(carries_not_made_gain_line), 
+            carries_support = sum(carries_support), 
+            carries = carries_crossed_gain_line + carries_not_made_gain_line + carries_support,
+            game_minutes = sum(minutes_played_total)) %>%
+  select(team, player_name, carries, carries_metres, game_minutes) %>%
+  arrange(desc(carries)) 
+
+kable(head(carries_by_player, 10), caption = "Top 10 Carries by player", col.names = c('Team', 'Player','Carries', 'Carry Meters', 'Game Minutes'))
+```
+
+France had 4 players in the top 10 in terms of carry meters
+
+```{r, echo=FALSE}
+carries_by_player <- tournament_data %>% 
+  group_by(team, player_name) %>% 
+  summarise(carries_metres = sum(carries_metres), 
+            carries_crossed_gain_line = sum(carries_crossed_gain_line), 
+            carries_not_made_gain_line = sum(carries_not_made_gain_line), 
+            carries_support = sum(carries_support), 
+            carries = carries_crossed_gain_line + carries_not_made_gain_line + carries_support,
+            game_minutes = sum(minutes_played_total)) %>%
+  select(team, player_name, carries, carries_metres, game_minutes) %>%
+  arrange(desc(carries_metres)) 
+
+kable(head(carries_by_player, 10), caption = "Top 10 Carries by player", col.names = c('Team', 'Player','Carries', 'Carry Meters', 'Game Minutes'))
+```
+
+Ireland again featured 4 players in terms of carries over the gain line
+
+```{r, echo=FALSE}
+carries_accross_gain_line_by_player <- tournament_data %>% 
+  group_by(team, player_name) %>% 
+  summarise(carries_metres = sum(carries_metres), 
+            carries_crossed_gain_line = sum(carries_crossed_gain_line), 
+            carries_not_made_gain_line = sum(carries_not_made_gain_line), 
+            carries_support = sum(carries_support), 
+            carries = carries_crossed_gain_line + carries_not_made_gain_line + carries_support,
+            game_minutes = sum(minutes_played_total)) %>%
+  select(team, player_name, carries, carries_crossed_gain_line, carries_metres, game_minutes) %>%
+  arrange(desc(carries_crossed_gain_line)) 
+
+kable(head(carries_accross_gain_line_by_player, 10), caption = "Top 10 Carries by player", col.names = c('Team', 'Player','Carries', 'Carries over Gain Line', 'Carry Meters', 'Game Minutes'))
+```
+
+
+
+
+
+
+
+

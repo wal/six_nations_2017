@@ -1,7 +1,7 @@
 source('R/common.R')
 
 metric_names = sort(names(tournament_data))
-metric_names[grep('su', metric_names)]
+metric_names[grep('carr', metric_names)]
 
 tackles_by_player <- tournament_data %>% 
   group_by(team) %>% 
